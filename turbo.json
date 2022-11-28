@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": ["NEXT_PUBLIC_CLIENT_ID", "NEXT_PUBLIC_CLIENT_SECRET"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
