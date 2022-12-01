@@ -1,24 +1,10 @@
-import express, { Request, Response } from "express";
-import { prisma } from "./services";
+import express from "express";
+import { createAd, getAdsByGame, getDiscordAd, getGames } from "./controllers";
 
 export const routes = express.Router();
 
-routes.route("/games").get(async (req: Request, res: Response) => {
-  const games = await prisma.game.findMany({
-    include: {
-      _count: {
-        select: {
-          ads: true,
-        },
-      },
-    },
-  });
+routes.route("/games").get(getGames);
 
-  return res.status(200).json(games);
-});
+routes.route("/games/:id/ads").get(getAdsByGame).post(createAd);
 
-routes.route("/games/:id/ads").get((req: Request, res: Response) => {});
-
-routes.route("/ads").post((req: Request, res: Response) => {});
-
-routes.route("/ads/:id/discord").get((req: Request, res: Response) => {});
+routes.route("/ads/:id/discord").get(getDiscordAd);
