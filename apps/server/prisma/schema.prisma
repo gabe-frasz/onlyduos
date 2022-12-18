@@ -1,20 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Game {
   id        String @id @default(uuid())
   title     String
   bannerUrl String
-  ads       Ad[]
+
+  ads Ad[]
 
   @@map("games")
 }
@@ -33,5 +32,6 @@ model Ad {
 
   game Game @relation(fields: [gameId], references: [id])
 
+  @@index([gameId])
   @@map("ads")
 }
