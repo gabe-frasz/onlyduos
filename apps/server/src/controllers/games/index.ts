@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { adSchema } from "zod-schemas";
 import { prisma } from "../../services";
 import {
   convertHourStringToMinutes,
@@ -97,16 +98,28 @@ export const getDiscord = async (req: Request, res: Response) => {
 export const createAd = async (req: Request, res: Response) => {
   const gameId = req.params.id;
 
+  const parsedBody = adSchema
+    .omit({
+      id: true,
+      gameId: true,
+      createdAt: true,
+    })
+    .safeParse(req.body);
+
+  if (!parsedBody.success) {
+    return res.status(400).send(parsedBody.error.message);
+  }
+
   await prisma.ad.create({
     data: {
       gameId,
-      discord: req.body.discord,
-      name: req.body.name,
-      yearsPlaying: req.body.yearsPlaying,
-      weekDays: req.body.weekDays,
-      hourStart: convertHourStringToMinutes(req.body.hourStart),
-      hourEnd: convertHourStringToMinutes(req.body.hourEnd),
-      useVoiceChannel: req.body.useVoiceChannel,
+      discord: parsedBody.data.discord,
+      name: parsedBody.data.name,
+      yearsPlaying: parsedBody.data.yearsPlaying,
+      weekDays: parsedBody.data.weekDays.join(","),
+      hourStart: convertHourStringToMinutes(parsedBody.data.hourStart),
+      hourEnd: convertHourStringToMinutes(parsedBody.data.hourEnd),
+      useVoiceChannel: parsedBody.data.useVoiceChannel,
     },
   });
 
